@@ -1,0 +1,27 @@
+package com.example.patrykmarchewka.demo.API.Uzytkownicy.Updater;
+
+import com.example.patrykmarchewka.demo.API.Uzytkownicy.Uzytkownicy;
+import com.example.patrykmarchewka.demo.API.Uzytkownicy.UzytkownicyRequestBody;
+
+public class UzytkownicyNazwiskoUpdater implements UzytkownicyCREATEUpdater,UzytkownicyPUTUpdater,UzytkownicyPATCHUpdater{
+    @Override
+    public void CREATEUpdate(Uzytkownicy uzytkownik, UzytkownicyRequestBody body) {
+        sharedUpdate(uzytkownik, body);
+    }
+
+    @Override
+    public void PATCHUpdate(Uzytkownicy uzytkownik, UzytkownicyRequestBody body) {
+        if (body.getNazwisko() != null){
+            sharedUpdate(uzytkownik, body);
+        }
+    }
+
+    @Override
+    public void PUTUpdate(Uzytkownicy uzytkownik, UzytkownicyRequestBody body) {
+        sharedUpdate(uzytkownik, body);
+    }
+
+    void sharedUpdate(Uzytkownicy uzytkownik, UzytkownicyRequestBody body){
+        uzytkownik.setNazwisko(body.getNazwisko());
+    }
+}
