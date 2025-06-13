@@ -1,15 +1,17 @@
 package com.example.patrykmarchewka.demo.API.Uzytkownicy;
 
+import com.example.patrykmarchewka.demo.API.OnCreate;
 import com.example.patrykmarchewka.demo.API.RoleUzytkownikow;
 import com.example.patrykmarchewka.demo.OdpowiedzAPI;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
 import java.util.List;
 
 @RestController
@@ -42,14 +44,14 @@ public class UzytkownicyController {
     }
 
     @PutMapping("/me")
-    public ResponseEntity<OdpowiedzAPI<UzytkownicyDTO>> putUzytkownik(Authentication authentication, @RequestBody UzytkownicyRequestBody body){
+    public ResponseEntity<OdpowiedzAPI<UzytkownicyDTO>> putUzytkownik(Authentication authentication, @RequestBody @Validated(OnCreate.class) UzytkownicyRequestBody body){
         Uzytkownicy uzytkownik = uzytkownicyService.getUzytkownik(authentication);
 
         return ResponseEntity.ok().body(new OdpowiedzAPI<>("Edytowano calkowicie uzytkownika",new UzytkownicyDTO(uzytkownicyService.putUzytkownicy(uzytkownik,body,() -> uzytkownik.getRola()))));
     }
 
     @PatchMapping("/me")
-    public ResponseEntity<OdpowiedzAPI<UzytkownicyDTO>> patchUzytkownik(Authentication authentication, @RequestBody UzytkownicyRequestBody body){
+    public ResponseEntity<OdpowiedzAPI<UzytkownicyDTO>> patchUzytkownik(Authentication authentication, @RequestBody @Valid UzytkownicyRequestBody body){
         Uzytkownicy uzytkownik = uzytkownicyService.getUzytkownik(authentication);
 
         return ResponseEntity.ok().body(new OdpowiedzAPI<>("Edytowano czesciowo uzytkownika", new UzytkownicyDTO(uzytkownicyService.patchUzytkownicy(uzytkownik,body,() -> uzytkownik.getRola()))));
@@ -64,15 +66,38 @@ public class UzytkownicyController {
 
     /*
     Zarejestrować kontrahenta (klienta)
+    Przykladowy JSON:
+    {
+  "vatID": "PL1234567890",
+  "imie": "Jan",
+  "nazwisko": "Kowalski",
+  "email": "user@example.com",
+  "haslo": "MojeSilneHaslo123!",
+  "telefon": "+48123456789",
+  "adres": [
+    {
+      "kraj": "POLSKA",
+      "miasto": "Warszawa",
+      "ulica": "Marszalkowska",
+      "kodPocztowy": "00-001",
+      "numerDomu": "12A",
+      "numerMieszkania": "34"
+    }
+  ]
+}
+
+
+
+
      */
     @PostMapping("/rejestracja")
-    public ResponseEntity<OdpowiedzAPI<UzytkownicyDTO>> createUzytkownik(@RequestBody UzytkownicyRequestBody body){
+    public ResponseEntity<OdpowiedzAPI<UzytkownicyDTO>> createUzytkownik(@RequestBody @Validated(OnCreate.class) UzytkownicyRequestBody body){
         return ResponseEntity.status(HttpStatus.CREATED).body(new OdpowiedzAPI<>("Stworzono nowego uzytkownika", new UzytkownicyDTO(uzytkownicyService.createUzytkownicy(body,() -> RoleUzytkownikow.KLIENT))));
     }
 
     @PreAuthorize("hasRole('PRACOWNIK')")
     @PostMapping("/rejestracja/pracownik")
-    public ResponseEntity<OdpowiedzAPI<UzytkownicyDTO>> createUzytkownikPracownik(@RequestBody UzytkownicyRequestBody body){
+    public ResponseEntity<OdpowiedzAPI<UzytkownicyDTO>> createUzytkownikPracownik(@RequestBody @Validated(OnCreate.class) UzytkownicyRequestBody body){
         return ResponseEntity.status(HttpStatus.CREATED).body(new OdpowiedzAPI<>("Stworzono nowego pracownika", new UzytkownicyDTO(uzytkownicyService.createUzytkownicy(body,() -> RoleUzytkownikow.PRACOWNIK))));
     }
 

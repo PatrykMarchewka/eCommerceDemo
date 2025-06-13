@@ -1,13 +1,16 @@
 package com.example.patrykmarchewka.demo.API.Produkty;
 
+import com.example.patrykmarchewka.demo.API.OnCreate;
 import com.example.patrykmarchewka.demo.API.Uzytkownicy.Uzytkownicy;
 import com.example.patrykmarchewka.demo.API.Uzytkownicy.UzytkownicyService;
 import com.example.patrykmarchewka.demo.OdpowiedzAPI;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,10 +37,25 @@ public class ProduktyController {
     /*
     Dodać produkt do oferty sklepu
     Każdy produkt powinien zawierać nazwę, cenę oraz informację o podatku VAT.
+
+    Przykladowy JSON
+    {
+  "nazwa": "Produkt testowy",
+  "cena": 100,
+  "stawkaVat": "DWADZIESCIA_TRZY",
+  "czyDostepny": true,
+  "dostepnaIlosc": 10
+}
+
+
+
      */
     @PreAuthorize("hasRole('PRACOWNIK')")
     @PostMapping
-    public ResponseEntity<OdpowiedzAPI<ProduktyDTO>> postProdukt(Authentication authentication, @RequestBody ProduktyRequestBody body){
+    public ResponseEntity<OdpowiedzAPI<ProduktyDTO>> postProdukt(Authentication authentication, @RequestBody @Validated(OnCreate.class) ProduktyRequestBody body){
+        if (body.getStawkaVat() == null && body.getNiestandarowyVat() == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new OdpowiedzAPI<>("Nie podano prawidlowej stawki VAT", null));
+        }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new OdpowiedzAPI<>("Dodano nowy produkt", new ProduktyDTO(produktyService.createProdukty(body), uzytkownicyService.getUzytkownik(authentication))));
     }
@@ -49,7 +67,15 @@ public class ProduktyController {
 
     @PreAuthorize("hasRole('PRACOWNIK')")
     @PutMapping("/{produktID}")
-    public ResponseEntity<OdpowiedzAPI<ProduktyDTO>> putProduktByID(Authentication authentication, @PathVariable Long produktID, @RequestBody ProduktyRequestBody body){
+    public ResponseEntity<OdpowiedzAPI<ProduktyDTO>> putProduktByID(Authentication authentication, @PathVariable Long produktID, @RequestBody @Validated(OnCreate.class) ProduktyRequestBody body){
+        if (!produktyService.existsByID(produktID)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new OdpowiedzAPI<>("Nie znaleziono produktu o podanym ID", null));
+        }
+        if (body.getStawkaVat() == null && body.getNiestandarowyVat() == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new OdpowiedzAPI<>("Nie podano prawidlowej stawki VAT", null));
+        }
+
+
         Uzytkownicy uzytkownik = uzytkownicyService.getUzytkownik(authentication);
         Produkty produkt = produktyService.getProduktByID(produktID);
         return ResponseEntity.ok(new OdpowiedzAPI<>("Edytowano w pelni produkt", new ProduktyDTO(produktyService.putProdukty(produkt,body), uzytkownik)));
@@ -57,7 +83,11 @@ public class ProduktyController {
 
     @PreAuthorize("hasRole('PRACOWNIK')")
     @PatchMapping("/{produktID}")
-    public ResponseEntity<OdpowiedzAPI<ProduktyDTO>> patchProduktByID(Authentication authentication, @PathVariable Long produktID, @RequestBody ProduktyRequestBody body){
+    public ResponseEntity<OdpowiedzAPI<ProduktyDTO>> patchProduktByID(Authentication authentication, @PathVariable Long produktID, @RequestBody @Valid ProduktyRequestBody body){
+        if (!produktyService.existsByID(produktID)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new OdpowiedzAPI<>("Nie znaleziono produktu o podanym ID", null));
+        }
+
         Uzytkownicy uzytkownik = uzytkownicyService.getUzytkownik(authentication);
         Produkty produkty = produktyService.getProduktByID(produktID);
         return ResponseEntity.ok(new OdpowiedzAPI<>("Edytowano czesciowo produkt", new ProduktyDTO(produktyService.patchProdukty(produkty,body),uzytkownik)));
@@ -66,7 +96,9 @@ public class ProduktyController {
     @PreAuthorize("hasRole('PRACOWNIK')")
     @DeleteMapping("/{produktID}")
     public ResponseEntity<OdpowiedzAPI<String>> deleteProduktByID(Authentication authentication, @PathVariable Long produktID){
-        Uzytkownicy uzytkownik = uzytkownicyService.getUzytkownik(authentication);
+        if (!produktyService.existsByID(produktID)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new OdpowiedzAPI<>("Nie znaleziono produktu o podanym ID", null));
+        }
         Produkty produkt = produktyService.getProduktByID(produktID);
         produktyService.deleteProdukty(produkt);
         return ResponseEntity.ok(new OdpowiedzAPI<>("Usunieto produkt",""));

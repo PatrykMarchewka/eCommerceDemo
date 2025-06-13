@@ -3,9 +3,6 @@ import com.example.patrykmarchewka.demo.API.Adresy.AdresyService;
 import com.example.patrykmarchewka.demo.API.Uzytkownicy.Uzytkownicy;
 import com.example.patrykmarchewka.demo.API.Uzytkownicy.UzytkownicyService;
 import com.example.patrykmarchewka.demo.API.Zamowienia.Updater.*;
-import com.example.patrykmarchewka.demo.API.Zamowienia_Produkty.Zamowienia_Produkty;
-import com.example.patrykmarchewka.demo.API.Zamowienia_Produkty.Zamowienia_ProduktyRepository;
-import com.example.patrykmarchewka.demo.API.Zamowienia_Produkty.Zamowienia_ProduktyRequestBody;
 import com.example.patrykmarchewka.demo.API.Zamowienia_Produkty.Zamowienia_ProduktyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,7 +63,6 @@ public class ZamowieniaService {
     @Transactional
     public Zamowienia createZamowienia(ZamowieniaRequestBody body, Supplier<LocalDateTime> data){
         Zamowienia zamowienie = new Zamowienia();
-        body.getAdresID();
         applyCreateUpdates(zamowienie,body, data);
         return saveZamowienia(zamowienie);
     }
@@ -95,21 +91,16 @@ public class ZamowieniaService {
         return zamowieniaRepository.getZamowieniaByID(ID).orElseThrow(RuntimeException::new);
     }
 
+    public boolean existsByID(Long ID){
+        return zamowieniaRepository.existsById(ID);
+    }
+
     public Zamowienia getZamowienieFromUzytkownicyAndID(Uzytkownicy uzytkownik, Long ID){
         return zamowieniaRepository.getZamowieniaByKlienciAndID(uzytkownik, ID);
     }
 
     public List<Zamowienia> getZamowieniaFromUzytkownicy(Uzytkownicy uzytkownik){
         return zamowieniaRepository.getAllByKlienci(uzytkownik);
-    }
-
-
-    public Zamowienia getZamowienieFromDTO(ZamowieniaDTO dto){
-        return getZamowienieFromID(dto.getID());
-    }
-
-    public List<Zamowienia> getZamowienieListFromDTOList(List<ZamowieniaDTO> dtoList){
-        return dtoList.stream().map(item -> getZamowienieFromDTO(item)).toList();
     }
 
 }

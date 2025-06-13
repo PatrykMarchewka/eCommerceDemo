@@ -18,7 +18,7 @@ public class SecurityConfig {
         httpSecurity
                 .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/rejestracja").permitAll()
+                .requestMatchers("api/uzytkownicy/rejestracja").permitAll()
                 .anyRequest().authenticated()).httpBasic();
         return httpSecurity.build();
     }

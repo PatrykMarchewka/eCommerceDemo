@@ -1,18 +1,27 @@
 package com.example.patrykmarchewka.demo.API.Produkty;
 
+import com.example.patrykmarchewka.demo.API.OnCreate;
 import com.example.patrykmarchewka.demo.API.StawkiVAT;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
 
 public class ProduktyRequestBody {
+    @NotBlank(groups = OnCreate.class)
     private String nazwa;
+    @Positive
     private BigDecimal cena;
     private StawkiVAT stawkaVat;
     private BigDecimal niestandarowyVat;
+    @NotNull(groups = OnCreate.class)
     private Boolean czyDostepny;
+    @PositiveOrZero
     private Integer dostepnaIlosc;
 
-    public ProduktyRequestBody(){};
+    public ProduktyRequestBody(){}
 
     public String getNazwa() {
         return nazwa;

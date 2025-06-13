@@ -1,5 +1,6 @@
 package com.example.patrykmarchewka.demo.API.Uzytkownicy;
 
+import com.example.patrykmarchewka.demo.API.Adresy.AdresyService;
 import com.example.patrykmarchewka.demo.API.RoleUzytkownikow;
 import com.example.patrykmarchewka.demo.API.Uzytkownicy.Updater.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +19,17 @@ import java.util.function.Supplier;
 public class UzytkownicyService implements UserDetailsService {
 
     private final UzytkownicyRepository uzytkownicyRepository;
+    private final AdresyService adresyService;
 
     @Autowired
-    public UzytkownicyService(UzytkownicyRepository uzytkownicyRepository){
+    public UzytkownicyService(UzytkownicyRepository uzytkownicyRepository, AdresyService adresyService){
         this.uzytkownicyRepository = uzytkownicyRepository;
+        this.adresyService = adresyService;
     }
 
     final List<UzytkownicyUpdater> updaters(Supplier<RoleUzytkownikow> rola){
         return List.of(
+                new UzytkownicyAdresyUpdater(adresyService),
                 new UzytkownicyVatIDUpdater(),
                 new UzytkownicyImieUpdater(),
                 new UzytkownicyNazwiskoUpdater(),
@@ -91,12 +95,12 @@ public class UzytkownicyService implements UserDetailsService {
         return uzytkownicyRepository.getUzytkownicyByEmail(authentication.getName()).orElseThrow(() -> new RuntimeException("Nie znaleziono uzytkownika"));
     }
 
-    public Uzytkownicy getUzytkownikFromDTO(UzytkownicyDTO dto){
-        return uzytkownicyRepository.getUzytkownicyByEmailAndHaslo(dto.getEmail(), dto.getHaslo()).orElseThrow(() -> new RuntimeException("Nie znaleziono uzytkownika"));
-    }
-
     public Uzytkownicy getUzytkownikByID(Long ID){
         return uzytkownicyRepository.getUzytkownicyByID(ID);
+    }
+
+    public boolean existsByID(Long ID){
+        return uzytkownicyRepository.existsById(ID);
     }
 
     public List<Uzytkownicy> getAllUzytkownicy(){

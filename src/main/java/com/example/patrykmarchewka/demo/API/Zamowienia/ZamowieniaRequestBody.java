@@ -1,15 +1,26 @@
 package com.example.patrykmarchewka.demo.API.Zamowienia;
 
+import com.example.patrykmarchewka.demo.API.OnCreate;
 import com.example.patrykmarchewka.demo.API.Uzytkownicy.Uzytkownicy;
 import com.example.patrykmarchewka.demo.API.Zamowienia_Produkty.Zamowienia_ProduktyRequestBody;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.util.List;
 
 public class ZamowieniaRequestBody {
     @JsonIgnore
     private Uzytkownicy kupujacy;
+    @NotEmpty(groups = OnCreate.class)
+    @Valid
+    @JsonProperty("produkty")
     private List<Zamowienia_ProduktyRequestBody> zamowieniaProduktyRequestBodyList;
+    @NotNull(groups = OnCreate.class)
+    @Positive
     private Long adresID;
 
     public ZamowieniaRequestBody(Uzytkownicy kupujacy, List<Zamowienia_ProduktyRequestBody> zamowieniaProduktyRequestBodyList, Long adresID){

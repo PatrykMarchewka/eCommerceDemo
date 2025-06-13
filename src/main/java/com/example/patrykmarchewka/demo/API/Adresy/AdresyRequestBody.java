@@ -1,12 +1,19 @@
 package com.example.patrykmarchewka.demo.API.Adresy;
 
 import com.example.patrykmarchewka.demo.API.Kraje;
+import com.example.patrykmarchewka.demo.API.OnCreate;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class AdresyRequestBody {
+    @NotNull(groups = OnCreate.class)
     private Kraje kraj;
+    @NotBlank(groups = OnCreate.class)
     private String miasto;
+    @NotBlank(groups = OnCreate.class)
     private String ulica;
     private String kodPocztowy;
+    @NotBlank(groups = OnCreate.class)
     private String numerDomu;
     private String numerMieszkania;
 

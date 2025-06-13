@@ -42,6 +42,7 @@ public class ProduktyDTO {
             this.podatek = cenaNetto.multiply(niestandarowyVat.divide(new BigDecimal(100),6,RoundingMode.HALF_UP));
             this.cenaBrutto = (cenaNetto.multiply((new BigDecimal(1).add(niestandarowyVat.divide(new BigDecimal(100),6, RoundingMode.HALF_UP))))).setScale(2,RoundingMode.HALF_UP);
         }
+        this.podatek = podatek.setScale(2,RoundingMode.HALF_UP);
         //cenaBrutto = cena * (1 + (vat/100), zaokrąglane w góre po 6 miejsach po przecinku przy dzielenium, koncowy wynik zaokraglany w gore po 2 miejsach po przecinku
         //Zaokraglanie w gore po 6 miejscach aby dzialalo z nawet najdziwniejszym VATem takim jak 17.935% lub 8.875%
 
@@ -69,7 +70,7 @@ public class ProduktyDTO {
         return cena.add(podatek).setScale(2,RoundingMode.HALF_UP).compareTo(cenaBrutto) == 0;
     }
 
-    public ProduktyDTO(){};
+    public ProduktyDTO(){}
 
 
     public Long getID() {

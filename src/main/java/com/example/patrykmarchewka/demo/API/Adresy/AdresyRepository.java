@@ -12,4 +12,6 @@ public interface AdresyRepository extends JpaRepository<Adresy,Long> {
     Adresy getAdresyByKlientAndID(Uzytkownicy klient, Long id);
 
     Adresy getAdresyByID(Long id);
+
+    boolean existsByKlientAndID(Uzytkownicy klient, Long id);
 }

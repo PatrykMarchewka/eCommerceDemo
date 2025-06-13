@@ -92,11 +92,11 @@ public class AdresyService {
         return adresyRepository.getAdresyByKlientAndID(uzytkownik, ID);
     }
 
-    public Adresy getByID(Long ID){
-        return adresyRepository.getAdresyByID(ID);
+    public boolean existsByKlientAndID(Uzytkownicy uzytkownik, Long ID){
+        return adresyRepository.existsByKlientAndID(uzytkownik, ID);
     }
 
-    public AdresyDTO getDTO(Adresy adres){
-        return new AdresyDTO(adres);
+    public Adresy getByID(Long ID){
+        return adresyRepository.getAdresyByID(ID);
     }
 }

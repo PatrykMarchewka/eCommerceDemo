@@ -83,12 +83,8 @@ public class ProduktyService {
         return produktyRepository.getProduktyByID(ID).orElseThrow(RuntimeException::new);
     }
 
-    public Produkty getProduktByDTO(ProduktyDTO dto){
-        return getProduktByID(dto.getID());
-    }
-
-    public ProduktyDTO getDTOByProdukt(Produkty produkt, Uzytkownicy uzytkownik){
-        return new ProduktyDTO(produkt,uzytkownik);
+    public boolean existsByID(Long ID){
+        return produktyRepository.existsById(ID);
     }
 
     public List<Produkty> getAllProdukty(){
